@@ -1,0 +1,3 @@
+name: Energy
+version: ${project.version}
+main: com.zikon.energy.Main
